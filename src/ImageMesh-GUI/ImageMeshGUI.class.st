@@ -9,8 +9,10 @@ Class {
 		'portInput',
 		'startButton',
 		'connectButton',
+		'killButton',
 		'imagesTable',
-		'workingModel'
+		'workingModel',
+		'connections'
 	],
 	#category : #'ImageMesh-GUI'
 }
@@ -33,6 +35,7 @@ ImageMeshGUI class >> defaultSpec [
 		add: #portInput at: 2@5;
 		add: #startButton at: 1@6;
 		add: #connectButton at: 2@6;		
+		add: #killButton at: 1@7;		
 		yourself);
 		add: #imagesTable
 ]
@@ -87,7 +90,9 @@ ImageMeshGUI >> initialExtent [
 { #category : #initialization }
 ImageMeshGUI >> initialize [
 
+	connections := OrderedCollection new.
 	self model: ImageMeshControlModel new.
+
 	super initialize.
 ]
 
@@ -95,7 +100,8 @@ ImageMeshGUI >> initialize [
 ImageMeshGUI >> initializePresenter [
 
 	startButton action: [ self startImages ].
-	connectButton action: [ self connectImages ]
+	connectButton action: [ self connectImages ].
+	killButton action: [ self killImages ].
 
 ]
 
@@ -116,6 +122,7 @@ ImageMeshGUI >> initializeWidgets [
 
 	startButton := self newButton label: 'Start'.
 	connectButton := self newButton label: 'Connect'.
+	killButton := self newButton label: 'Kill all'.
 
 	imagesTable := self newTable.
 	imagesTable
@@ -123,6 +130,14 @@ ImageMeshGUI >> initializeWidgets [
 		addColumn: (StringTableColumn title: 'port' evaluated: #portString);
 		addColumn: (StringTableColumn title: 'connected' evaluated: #isConnectedString);
 		items: #().
+]
+
+{ #category : #initialization }
+ImageMeshGUI >> killImages [
+
+	connections do: [ :each | each process terminate ].
+	connections := OrderedCollection new.
+
 ]
 
 { #category : #initialization }
@@ -135,4 +150,38 @@ ImageMeshGUI >> modelChanged [
 
 { #category : #initialization }
 ImageMeshGUI >> startImages [
+
+	self fillModelWithFormContent.
+	
+	self model: workingModel.
+	self announcingObject valueChanged.
+	
+	self startImagesWith: self model.
+	
+]
+
+{ #category : #initialization }
+ImageMeshGUI >> startImagesWith: aConnectionModel [
+
+	connections := (1 to: aConnectionModel imagesCount) collect: [ :workerId | 
+		| port process formattedArguments|
+		port := workerId + (aConnectionModel port - 1).
+		
+		formattedArguments := aConnectionModel arguments collect: [ :each | each format: { port } ].
+
+		process := OSSUnixSubprocess new
+			command: aConnectionModel vmPath;
+			workingDirectory: aConnectionModel workingDirectory;
+			arguments: { '-nodisplay'. aConnectionModel imageName }, formattedArguments;
+			redirectStdout;
+			run.
+			
+		ImageMeshConnectionModel new 
+			isConnected: false;
+			port: port;
+			process: process;
+			pid: process pid.
+	].
+
+
 ]

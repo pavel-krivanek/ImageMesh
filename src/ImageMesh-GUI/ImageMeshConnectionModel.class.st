@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'pid',
 		'port',
-		'isConnected'
+		'isConnected',
+		'process'
 	],
 	#category : #'ImageMesh-GUI'
 }
@@ -55,4 +56,14 @@ ImageMeshConnectionModel >> port: anObject [
 ImageMeshConnectionModel >> portString [
 
 	^ self port asString
+]
+
+{ #category : #accessing }
+ImageMeshConnectionModel >> process [
+	^ process
+]
+
+{ #category : #accessing }
+ImageMeshConnectionModel >> process: anObject [
+	process := anObject
 ]
