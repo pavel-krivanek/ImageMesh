@@ -19,6 +19,6 @@ BaselineOfImageMesh >> baseline: spec [
 					repository: 'github://pharo-contributions/OSSubprocess'. ].		
 			spec baseline: 'TaskIt' with: [
 				spec
-					repository: 'github://pavel-krivanek/TelePharo:49-baseline-for-P8'. ].		
+					repository: 'github://pavel-krivanek/taskit:49-baseline-for-P8'. ].		
 			spec package: 'ImageMesh-GUI'.		]
 ]
