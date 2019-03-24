@@ -6,7 +6,8 @@ Class {
 		'vmPath',
 		'workingDirectory',
 		'imageName',
-		'arguments'
+		'arguments',
+		'processes'
 	],
 	#category : #'ImageMesh-GUI'
 }
