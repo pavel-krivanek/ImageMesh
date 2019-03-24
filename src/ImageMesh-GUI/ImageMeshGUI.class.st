@@ -1,6 +1,6 @@
 Class {
 	#name : #ImageMeshGUI,
-	#superclass : #ComposablePresenter,
+	#superclass : #ComposablePresenterWithModel,
 	#instVars : [
 		'vmPathInput',
 		'imageDirectoryInput',
@@ -9,7 +9,8 @@ Class {
 		'portInput',
 		'startButton',
 		'connectButton',
-		'imagesTable'
+		'imagesTable',
+		'workingModel'
 	],
 	#category : #'ImageMesh-GUI'
 }
@@ -44,8 +45,58 @@ ImageMeshGUI class >> open [
 ]
 
 { #category : #initialization }
+ImageMeshGUI >> connectImages [
+]
+
+{ #category : #initialization }
+ImageMeshGUI >> fillFormWithWorkingModel [
+
+	| aModel |
+	aModel := workingModel.
+
+	imagesCountInput number: aModel imagesCount.
+	vmPathInput text:	aModel vmPath.
+	imageDirectoryInput text: aModel workingDirectory.
+	imageNameInput	text: aModel imageName.
+	vmPathInput	text: aModel vmPath.
+	portInput number:	aModel port.
+		
+
+]
+
+{ #category : #initialization }
+ImageMeshGUI >> fillModelWithFormContent [
+
+	workingModel
+		imagesCount: imagesCountInput number;
+		vmPath: vmPathInput text;
+		workingDirectory: imageDirectoryInput text;
+		imageName: imageNameInput text;
+		vmPath: vmPathInput text;
+		vmPath: vmPathInput text;
+		port: portInput number.
+		
+
+]
+
+{ #category : #initialization }
 ImageMeshGUI >> initialExtent [
-	^ (900@600) 
+	^ 900@600 
+]
+
+{ #category : #initialization }
+ImageMeshGUI >> initialize [
+
+	self model: ImageMeshControlModel new.
+	super initialize.
+]
+
+{ #category : #initialization }
+ImageMeshGUI >> initializePresenter [
+
+	startButton action: [ self startImages ].
+	connectButton action: [ self connectImages ]
+
 ]
 
 { #category : #initialization }
@@ -72,4 +123,16 @@ ImageMeshGUI >> initializeWidgets [
 		addColumn: (StringTableColumn title: 'port' evaluated: #portString);
 		addColumn: (StringTableColumn title: 'connected' evaluated: #isConnectedString);
 		items: #().
+]
+
+{ #category : #initialization }
+ImageMeshGUI >> modelChanged [
+
+	workingModel := self model copy.
+
+	self fillFormWithWorkingModel.
+]
+
+{ #category : #initialization }
+ImageMeshGUI >> startImages [
 ]

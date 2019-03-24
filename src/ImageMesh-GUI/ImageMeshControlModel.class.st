@@ -7,7 +7,7 @@ Class {
 		'workingDirectory',
 		'imageName',
 		'arguments',
-		'processes'
+		'port'
 	],
 	#category : #'ImageMesh-GUI'
 }
@@ -40,6 +40,33 @@ ImageMeshControlModel >> imagesCount [
 { #category : #accessing }
 ImageMeshControlModel >> imagesCount: anObject [
 	imagesCount := anObject
+]
+
+{ #category : #accessing }
+ImageMeshControlModel >> initialize [ 
+	
+	super initialize.
+	
+	vmPath := '/home/krivanek/Documents/tele2/pharo-minimal/vm/64/pharo'.
+	workingDirectory := '/home/krivanek/Documents/tele2/pharo-minimal/telepharo'.
+	
+	imageName := 'server.image'.
+	
+	arguments := {'eval'. '--no-quit'. 'CodeImporter evaluateFileStream: ''/home/krivanek/Documents/tele2/client/Mesh.st'' asFileReference readStream. TlpRemoteUIManager registerOnPort: {1}'}.
+
+	port := 40421. 
+	imagesCount := 4.
+	
+]
+
+{ #category : #accessing }
+ImageMeshControlModel >> port [
+	^ port
+]
+
+{ #category : #accessing }
+ImageMeshControlModel >> port: anObject [
+	port := anObject
 ]
 
 { #category : #accessing }
