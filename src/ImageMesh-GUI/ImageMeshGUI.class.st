@@ -64,7 +64,7 @@ ImageMeshGUI >> fillFormWithWorkingModel [
 	vmPathInput	text: aModel vmPath.
 	portInput number:	aModel port.
 		
-
+	imagesTable items: connections.
 ]
 
 { #category : #initialization }
@@ -129,7 +129,7 @@ ImageMeshGUI >> initializeWidgets [
 		addColumn: (StringTableColumn title: 'pid' evaluated: #pidString);
 		addColumn: (StringTableColumn title: 'port' evaluated: #portString);
 		addColumn: (StringTableColumn title: 'connected' evaluated: #isConnectedString);
-		items: #().
+		items: connections.
 ]
 
 { #category : #initialization }
@@ -137,6 +137,8 @@ ImageMeshGUI >> killImages [
 
 	connections do: [ :each | each process terminate ].
 	connections := OrderedCollection new.
+	
+	imagesTable items: connections.
 
 ]
 
@@ -146,6 +148,8 @@ ImageMeshGUI >> modelChanged [
 	workingModel := self model copy.
 
 	self fillFormWithWorkingModel.
+
+	
 ]
 
 { #category : #initialization }
@@ -158,6 +162,8 @@ ImageMeshGUI >> startImages [
 	
 	self startImagesWith: self model.
 	
+	imagesTable items: connections.
+
 ]
 
 { #category : #initialization }
