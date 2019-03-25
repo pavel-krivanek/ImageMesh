@@ -49,6 +49,62 @@ ImageMeshGUI class >> open [
 
 { #category : #initialization }
 ImageMeshGUI >> connectImages [
+
+	| combinations  futures |
+	self disconnectAll.	
+	
+	self connections do: #connect.
+	
+	combinations := self eachToEachCombinationsFor: connections size.
+	futures := connections withIndexCollect: [ :connection :index | 
+		| f  | 
+		connection peer  logCr.
+		f := [ connection peer evaluate: [
+			| peers myPeers myCombinations |
+			Transcript show: index.
+			peers := 	SmalltalkImage current at: #connections ifAbsentPut: [ Dictionary new ].
+			myCombinations := combinations select: [ :e | e first = index ] thenCollect: #second.
+			Mesh current index: index.
+			myCombinations do: [ :remoteIndex | 
+				Mesh current connectTo: remoteIndex.
+				 ] ].				
+		] future.
+		f onSuccessDo: [ :e | Transcript show: 'worker '; show: index; show: ' finished: '; show: e; cr. ] ].
+
+"workers collect: [ :worker | worker evaluate: [ Mesh current remoteMeshes values collect: #index ] ] .
+"
+]
+
+{ #category : #initialization }
+ImageMeshGUI >> connections [ 
+
+	^ connections
+]
+
+{ #category : #initialization }
+ImageMeshGUI >> disconnectAll [
+
+	connections do: #disconnect.
+	[TlpRemoteIDE disconnectAll] on: Warning do: [ :e | e resume ].
+	TKTCommonQueueWorkerPool allInstancesDo: #reset.
+
+	
+]
+
+{ #category : #initialization }
+ImageMeshGUI >> eachToEachCombinationsFor: nodesCount [
+
+	| combinations out |
+
+	combinations := Set new.
+	1 to: nodesCount do: [ :a |
+		out := true.
+		a+1 to: nodesCount do: [ :b |
+			combinations add: (
+				out ifTrue: [ { a. b } ] ifFalse: [ { b. a } ]).
+			out := out not. ] ].
+
+	^ combinations collect: [:e | e asArray] as: Array.
 ]
 
 { #category : #initialization }

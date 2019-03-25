@@ -5,10 +5,27 @@ Class {
 		'pid',
 		'port',
 		'isConnected',
-		'process'
+		'process',
+		'remote'
 	],
 	#category : #'ImageMesh-GUI'
 }
+
+{ #category : #accessing }
+ImageMeshConnectionModel >> connect [
+
+	remote := (TlpRemoteIDE connectTo: (TCPAddress localAt: self port)).
+	isConnected := true.
+	^ remote
+]
+
+{ #category : #accessing }
+ImageMeshConnectionModel >> disconnect [ 
+
+	self peer ifNotNil: [ :thePeer | 
+		[ self peer disconnect ]  on: Warning do: [ :e | e resume ] ].
+	isConnected := false.
+]
 
 { #category : #accessing }
 ImageMeshConnectionModel >> isConnected [
@@ -24,6 +41,12 @@ ImageMeshConnectionModel >> isConnected: anObject [
 ImageMeshConnectionModel >> isConnectedString [
 
 	^ self isConnected asString
+]
+
+{ #category : #accessing }
+ImageMeshConnectionModel >> peer [
+
+	^ self remote ifNotNil: [ :theRemote | theRemote remotePeer ]
 ]
 
 { #category : #accessing }
@@ -66,4 +89,14 @@ ImageMeshConnectionModel >> process [
 { #category : #accessing }
 ImageMeshConnectionModel >> process: anObject [
 	process := anObject
+]
+
+{ #category : #accessing }
+ImageMeshConnectionModel >> remote [
+	^ remote
+]
+
+{ #category : #accessing }
+ImageMeshConnectionModel >> remote: anObject [
+	remote := anObject
 ]
