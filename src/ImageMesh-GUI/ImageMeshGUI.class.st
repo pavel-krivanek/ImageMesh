@@ -13,7 +13,9 @@ Class {
 		'playgroundButton',
 		'imagesTable',
 		'workingModel',
-		'connections'
+		'connections',
+		'notebook',
+		'packagesList'
 	],
 	#category : #'ImageMesh-GUI'
 }
@@ -23,6 +25,7 @@ ImageMeshGUI class >> defaultSpec [
 
 	^ SpecBoxLayout newHorizontal
 		add: (
+		SpecBoxLayout newVertical add: (
 		SpecGridLayout new
 		add: #vmPathLabel at: 1@1;
 		add: #vmPathInput at: 2@1;
@@ -39,6 +42,7 @@ ImageMeshGUI class >> defaultSpec [
 		add: #killButton at: 1@7;		
 		add: #playgroundButton at: 2@7;		
 		yourself);
+		add: #notebook);
 		add: #imagesTable
 ]
 
@@ -186,7 +190,7 @@ ImageMeshGUI >> initializeWidgets [
 
 	startButton := self newButton label: 'Start'.
 	connectButton := self newButton label: 'Connect'.
-	killButton := self newButton label: 'Kill all'.
+	killButton := self newButton label: 'Stop all'.
 	playgroundButton := self newButton label: 'Playground'.
 
 	imagesTable := self newTable.
@@ -226,6 +230,26 @@ ImageMeshGUI >> initializeWidgets [
 					action: [ imagesTable selection selectedItem inspect ]].
 	].
 	imagesTable contextMenu: menu. 	
+	
+	notebook := self newNotebook.
+	notebook
+		addPage: self packagesTab.
+]
+
+{ #category : #initialization }
+ImageMeshGUI >> installOnNodes: package [
+
+	| nodes data | 
+	
+	nodes := self connections select: #isConnected.
+	nodes ifEmpty: [ ^ self ].
+	data := nodes first mcPackageDataOf: package.
+	nodes do: [ :node | 
+		| future |
+		future := [ node node mcInstallPackage: data ] future.
+		future onSuccessDo: [ :value | self inform: package name asString ]
+		 ].
+	
 ]
 
 { #category : #initialization }
@@ -257,6 +281,48 @@ ImageMeshGUI >> openPlayground [
 	bindings := Dictionary newFrom: { #connections-> connections }.
 	playground setBindings: bindings.
 	
+
+]
+
+{ #category : #initialization }
+ImageMeshGUI >> packagesTab [
+	^ NotebookPage title: 'Packages' icon: (self iconNamed: #smallPackage) provider: [ 
+		| menu |
+		packagesList := self newList.
+		packagesList itemSubstringFilter.
+		self refreshPackagesList.
+		packagesList displayBlock: [ :m | m name ].
+		
+		menu := MenuPresenter new.
+		menu addGroup: [ :group |
+			group addItem: [ :item |
+				item
+					name: 'Install on nodes';
+					action: [ 
+						self installOnNodes: packagesList selection selectedItem ]].
+			group addItem: [ :item |
+				item
+					name: 'Browse';
+					action: [ 
+						packagesList selection selectedItem browse ]]].
+		menu addGroup: [ :group |
+			group addItem: [ :item |
+				item
+					name: 'Refresh';
+					action: [ 
+						self refreshPackagesList  ]].
+	].
+	packagesList contextMenu: menu.
+		
+		
+		packagesList.
+	]
+]
+
+{ #category : #initialization }
+ImageMeshGUI >> refreshPackagesList [ 
+
+	packagesList items: (RPackageOrganizer default packages sorted: [:a :b | a name <= b name ]).
 
 ]
 
