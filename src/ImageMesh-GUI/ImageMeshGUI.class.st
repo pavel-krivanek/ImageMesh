@@ -10,6 +10,7 @@ Class {
 		'startButton',
 		'connectButton',
 		'killButton',
+		'playgroundButton',
 		'imagesTable',
 		'workingModel',
 		'connections'
@@ -36,6 +37,7 @@ ImageMeshGUI class >> defaultSpec [
 		add: #startButton at: 1@6;
 		add: #connectButton at: 2@6;		
 		add: #killButton at: 1@7;		
+		add: #playgroundButton at: 2@7;		
 		yourself);
 		add: #imagesTable
 ]
@@ -49,29 +51,33 @@ ImageMeshGUI class >> open [
 
 { #category : #initialization }
 ImageMeshGUI >> connectImages [
-
-	| combinations  futures |
-	self disconnectAll.	
-	
+	| combinations futures |
+	self disconnectAll.
 	self connections do: #connect.
-	
 	combinations := self eachToEachCombinationsFor: connections size.
-	futures := connections withIndexCollect: [ :connection :index | 
-		| f  | 
-		connection peer  logCr.
-		f := [ connection peer evaluate: [
-			| peers myPeers myCombinations |
-			Transcript show: index.
-			peers := 	SmalltalkImage current at: #connections ifAbsentPut: [ Dictionary new ].
-			myCombinations := combinations select: [ :e | e first = index ] thenCollect: #second.
-			Mesh current index: index.
-			myCombinations do: [ :remoteIndex | 
-				Mesh current connectTo: remoteIndex.
-				 ] ].				
-		] future.
-		f onSuccessDo: [ :e | Transcript show: 'worker '; show: index; show: ' finished: '; show: e; cr. ] ].
+	futures := connections
+		withIndexCollect: [ :connection :index | 
+			| f |
+			connection peer logCr.
+			f := [ connection peer
+				evaluate: [ | peers myPeers myCombinations |
+					Transcript show: index.
+					peers := SmalltalkImage current
+						at: #connections
+						ifAbsentPut: [ Dictionary new ].
+					myCombinations := combinations
+						select: [ :e | e first = index ]
+						thenCollect: #second.
+					Mesh current index: index.
+					myCombinations
+						do: [ :remoteIndex | Mesh current connectTo: remoteIndex ] ] ]
+				future.
+			f
+				onSuccessDo: [ :e | 
+					connection isConnected: true.
+					imagesTable adapter refreshList ] ]
 
-"workers collect: [ :worker | worker evaluate: [ Mesh current remoteMeshes values collect: #index ] ] .
+	"workers collect: [ :worker | worker evaluate: [ Mesh current remoteMeshes values collect: #index ] ] .
 "
 ]
 
@@ -158,12 +164,14 @@ ImageMeshGUI >> initializePresenter [
 	startButton action: [ self startImages ].
 	connectButton action: [ self connectImages ].
 	killButton action: [ self killImages ].
+	playgroundButton action: [ self openPlayground ].
 
 ]
 
 { #category : #initialization }
 ImageMeshGUI >> initializeWidgets [
 
+	| menu |
 	self additionalSubpresentersMap at: #vmPathLabel put: (self newLabel label: 'VM path:').
 	self additionalSubpresentersMap at: #imageDirectoryLabel put: (self newLabel label: 'image directory:').
 	self additionalSubpresentersMap at: #imageNameLabel put: (self newLabel label: 'image name:').
@@ -179,6 +187,7 @@ ImageMeshGUI >> initializeWidgets [
 	startButton := self newButton label: 'Start'.
 	connectButton := self newButton label: 'Connect'.
 	killButton := self newButton label: 'Kill all'.
+	playgroundButton := self newButton label: 'Playground'.
 
 	imagesTable := self newTable.
 	imagesTable
@@ -186,6 +195,37 @@ ImageMeshGUI >> initializeWidgets [
 		addColumn: (StringTableColumn title: 'port' evaluated: #portString);
 		addColumn: (StringTableColumn title: 'connected' evaluated: #isConnectedString);
 		items: connections.
+		
+	menu := MenuPresenter new.
+	menu addGroup: [ :group |
+			group addItem: [ :item |
+				item
+					name: 'Connect';
+					action: [ 
+						imagesTable selection selectedItem connect.
+						imagesTable adapter refreshList ]].
+			group addItem: [ :item |
+				item
+					name: 'Disconnect';
+					action: [ 
+						imagesTable selection selectedItem disconnect.
+						imagesTable adapter refreshList ]].
+			group addItem: [ :item |
+				item
+					name: 'open Browser';
+					action: [ 
+						imagesTable selection selectedItem openBrowser ]].
+			group addItem: [ :item |
+				item
+					name: 'open Playground';
+					action: [ 
+						imagesTable selection selectedItem openPlayground ]].
+			group addItem: [ :item |
+				item
+					name: 'Inspect';
+					action: [ imagesTable selection selectedItem inspect ]].
+	].
+	imagesTable contextMenu: menu. 	
 ]
 
 { #category : #initialization }
@@ -206,6 +246,18 @@ ImageMeshGUI >> modelChanged [
 	self fillFormWithWorkingModel.
 
 	
+]
+
+{ #category : #initialization }
+ImageMeshGUI >> openPlayground [ 
+	
+	| playground bindings |
+
+	playground := GTPlayground openContents: 'connections collect: [ :worker | worker peer evaluate: [ Mesh current remoteMeshes values collect: #index ] ].'.
+	bindings := Dictionary newFrom: { #connections-> connections }.
+	playground setBindings: bindings.
+	
+
 ]
 
 { #category : #initialization }

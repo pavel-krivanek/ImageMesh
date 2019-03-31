@@ -9,7 +9,7 @@ Class {
 	#classVars : [
 		'Current'
 	],
-	#category : #'ImageMesh-GUI'
+	#category : #'ImageMesh-Node'
 }
 
 { #category : #'as yet unclassified' }
@@ -50,6 +50,12 @@ f onSuccessDo: [ :e |
 	Transcript show: 'remote mesh installed in '; show: remoteIndex; show: ' from: '; show: self index; cr. ].
 
 ] on: Error do: [ :err | Transcript show: err; cr. thisContext stack logCr.]
+]
+
+{ #category : #'as yet unclassified' }
+Mesh >> extension [ 
+
+	 ^ 42
 ]
 
 { #category : #'as yet unclassified' }
