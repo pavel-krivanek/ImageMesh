@@ -6,7 +6,8 @@ Class {
 		'port',
 		'isConnected',
 		'process',
-		'remote'
+		'remote',
+		'node'
 	],
 	#category : #'ImageMesh-GUI'
 }
@@ -21,6 +22,7 @@ ImageMeshConnectionModel >> browse [
 ImageMeshConnectionModel >> connect [
 
 	remote := (TlpRemoteIDE connectTo: (TCPAddress localAt: self port)).
+	node := self peer evaluate: [ ImageMeshNode current ].
 	isConnected := true.
 	^ remote
 ]

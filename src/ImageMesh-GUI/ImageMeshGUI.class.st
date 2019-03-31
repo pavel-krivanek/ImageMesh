@@ -68,9 +68,9 @@ ImageMeshGUI >> connectImages [
 					myCombinations := combinations
 						select: [ :e | e first = index ]
 						thenCollect: #second.
-					Mesh current index: index.
+					ImageMeshNode current index: index.
 					myCombinations
-						do: [ :remoteIndex | Mesh current connectTo: remoteIndex ] ] ]
+						do: [ :remoteIndex | ImageMeshNode current connectTo: remoteIndex ] ] ]
 				future.
 			f
 				onSuccessDo: [ :e | 
