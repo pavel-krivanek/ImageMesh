@@ -8,7 +8,7 @@ Class {
 BaselineOfImageMeshNode >> baseline: spec [
 	<baseline>
 	spec
-		for: #pharo
+		for: #common
 		do: [ 
 			spec package: 'ImageMesh-Node'
 		]

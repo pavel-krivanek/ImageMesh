@@ -46,9 +46,9 @@ ImageMeshControlModel >> imagesCount: anObject [
 ImageMeshControlModel >> initialize [
 	super initialize.
 	vmPath := Smalltalk vm directory , '/pharo'.
-	workingDirectory := '/home/krivanek/Documents/tele2/pharo-minimal/telepharo'.
-	imageName := 'server.image'.
-	arguments := {'eval' . '--no-quit' . 'CodeImporter evaluateFileStream: ''/home/krivanek/Documents/tele2/client/Mesh.st'' asFileReference readStream. TlpRemoteUIManager registerOnPort: {1}'}.
+	workingDirectory := '/home/krivanek/Pharo/images/mesh1/test1/server/'.
+	imageName := 'node.image'.
+	arguments := {'eval' . '--no-quit' . 'TlpRemoteUIManager registerOnPort: {1}'}.
 	port := 40421.
 	imagesCount := 4
 ]
