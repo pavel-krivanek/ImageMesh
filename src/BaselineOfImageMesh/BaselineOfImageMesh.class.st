@@ -20,5 +20,19 @@ BaselineOfImageMesh >> baseline: spec [
 			spec baseline: 'TaskIt' with: [
 				spec
 					repository: 'github://pavel-krivanek/taskit:49-baseline-for-P8'. ].		
-			spec package: 'ImageMesh-GUI'.		]
+			spec baseline: 'Hermes' with: [
+				spec
+					repository: 'github://tesonep/hermes';
+					loads: 'core' ].		
+
+			spec package: 'ImageMesh-Node' with: [ spec requires: #()].
+			spec package: 'ImageMesh-GUI' with: [ spec requires: #(TelePharo OSSubprocess TaskIt Hermes)].
+				
+		spec
+			group: 'node'
+			with: #('ImageMesh-Node').
+		spec
+			group: 'default'
+			with: #(TelePharo OSSubprocess TaskIt Hermes 'ImageMesh-Node' 'ImageMesh-GUI').
+	]
 ]

@@ -86,6 +86,12 @@ ImageMeshConnectionModel >> mcPackageDataOf: aPackage [
 ]
 
 { #category : #accessing }
+ImageMeshConnectionModel >> node [ 
+	
+	^ node
+]
+
+{ #category : #accessing }
 ImageMeshConnectionModel >> openBrowser [ 
 	
 	self remote openBrowser.
