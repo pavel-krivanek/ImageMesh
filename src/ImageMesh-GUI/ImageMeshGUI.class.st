@@ -1,6 +1,6 @@
 Class {
 	#name : #ImageMeshGUI,
-	#superclass : #ComposablePresenterWithModel,
+	#superclass : #SpPresenterWithModel,
 	#instVars : [
 		'vmPathInput',
 		'imageDirectoryInput',
@@ -23,10 +23,10 @@ Class {
 { #category : #specs }
 ImageMeshGUI class >> defaultSpec [
 
-	^ SpecBoxLayout newHorizontal
+	^ SpBoxLayout newHorizontal
 		add: (
-		SpecBoxLayout newVertical add: (
-		SpecGridLayout new
+		SpBoxLayout newVertical add: (
+		SpGridLayout new
 		add: #vmPathLabel at: 1@1;
 		add: #vmPathInput at: 2@1;
 		add: #imageDirectoryLabel at: 1@2;
@@ -195,12 +195,12 @@ ImageMeshGUI >> initializeWidgets [
 
 	imagesTable := self newTable.
 	imagesTable
-		addColumn: (StringTableColumn title: 'pid' evaluated: #pidString);
-		addColumn: (StringTableColumn title: 'port' evaluated: #portString);
-		addColumn: (StringTableColumn title: 'connected' evaluated: #isConnectedString);
+		addColumn: (SpStringTableColumn title: 'pid' evaluated: #pidString);
+		addColumn: (SpStringTableColumn title: 'port' evaluated: #portString);
+		addColumn: (SpStringTableColumn title: 'connected' evaluated: #isConnectedString);
 		items: connections.
 		
-	menu := MenuPresenter new.
+	menu := SpMenuPresenter new.
 	menu addGroup: [ :group |
 			group addItem: [ :item |
 				item
@@ -286,14 +286,14 @@ ImageMeshGUI >> openPlayground [
 
 { #category : #initialization }
 ImageMeshGUI >> packagesTab [
-	^ NotebookPage title: 'Packages' icon: (self iconNamed: #smallPackage) provider: [ 
+	^ SpNotebookPage title: 'Packages' icon: (self iconNamed: #smallPackage) provider: [ 
 		| menu |
 		packagesList := self newList.
-		packagesList itemSubstringFilter.
+		packagesList enableSearch.
 		self refreshPackagesList.
-		packagesList displayBlock: [ :m | m name ].
+		packagesList display: [ :m | m name ].
 		
-		menu := MenuPresenter new.
+		menu := SpMenuPresenter new.
 		menu addGroup: [ :group |
 			group addItem: [ :item |
 				item

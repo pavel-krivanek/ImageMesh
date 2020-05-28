@@ -54,8 +54,8 @@ ImageMeshNode class >> current [
 ImageMeshNode class >> initialize [ 
 
 	Smalltalk vm maxExternalSemaphoresSilently: 5000.
-	
-	TKTConfiguration profile: TKTProfile production.
+	"
+	TKTConfiguration profile: TKTProfile production."
 
 	Current := self new.
 ]
